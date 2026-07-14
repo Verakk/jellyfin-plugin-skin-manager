@@ -204,9 +204,24 @@ h1, h2, h3, .sectionTitle, .pageTitle {
     background-color: #0d0d0d;
 }
 
+/* Relax Jellyfin's `contain: strict` on the image container. Its `size`
+   containment together with height:100% stops the background artwork from
+   painting when an ancestor is transformed — this is what blanked cards on
+   hover (confirmed: removing the height makes the image reappear). Keep layout
+   + paint so the rounded corners still clip. */
+.cardScalable .cardImageContainer,
+.cardContent.cardImageContainer {
+    contain: layout paint style !important;
+}
+
+/* Scale the whole tile (artwork + title together). This is the element
+   Jellyfin itself transforms for its focus animation, so it's the safe target,
+   and it means the title highlights along with the poster. */
+.card > .cardBox {
+    transition: transform 0.3s var(--nfx-ease);
+}
 .cardScalable {
-    transition: transform 0.28s var(--nfx-ease),
-                box-shadow 0.28s var(--nfx-ease);
+    transition: box-shadow 0.28s var(--nfx-ease);
 }
 
 /* Hover overlay: a clean Netflix bottom-scrim gradient that keeps the artwork
@@ -244,9 +259,12 @@ h1, h2, h3, .sectionTitle, .pageTitle {
 .card:hover {
     z-index: 999;
 }
-.card:focus .cardScalable,
-.card:hover .cardScalable {
+.card:hover > .cardBox,
+.card:focus > .cardBox {
     transform: scale(var(--nfx-card-hover));
+}
+.card:hover .cardScalable,
+.card:focus .cardScalable {
     box-shadow: var(--nfx-shadow-hover);
 }
 
@@ -498,9 +516,9 @@ input:checked + .mdl-switch__label + .mdl-switch__track ~ .mdl-switch__thumb,
 
 /* Landscape "My Media" / backdrop tiles: a gentler lift so wide cards
    don't collide with their neighbours */
-.card.backdropCard:hover .cardScalable,
-.overflowBackdropCard:hover .cardScalable,
-.card.bannerCard:hover .cardScalable {
+.card.backdropCard:hover > .cardBox,
+.overflowBackdropCard:hover > .cardBox,
+.card.bannerCard:hover > .cardBox {
     transform: scale(1.07);
 }
 
@@ -547,10 +565,9 @@ input:checked + .mdl-switch__label + .mdl-switch__track ~ .mdl-switch__thumb,
    ============================================================================= */
 
 /* Deliberate hover-in delay (no delay on hover-out so it snaps back cleanly) */
-.card:hover .cardScalable,
-.card:focus .cardScalable {
-    transition: transform 0.32s var(--nfx-ease) 0.12s,
-                box-shadow 0.32s var(--nfx-ease) 0.12s;
+.card:hover > .cardBox,
+.card:focus > .cardBox {
+    transition: transform 0.32s var(--nfx-ease) 0.12s;
 }
 
 /* Extra vertical breathing room on horizontal rows so the grown poster has
@@ -562,11 +579,11 @@ input:checked + .mdl-switch__label + .mdl-switch__track ~ .mdl-switch__thumb,
 }
 
 /* Edge posters grow inward so they never spill off the screen */
-.itemsContainer > .card:first-child:hover .cardScalable,
-.scrollSlider > .card:first-child:hover .cardScalable {
+.itemsContainer > .card:first-child:hover > .cardBox,
+.scrollSlider > .card:first-child:hover > .cardBox {
     transform-origin: left center;
 }
-.itemsContainer > .card:last-child:hover .cardScalable,
-.scrollSlider > .card:last-child:hover .cardScalable {
+.itemsContainer > .card:last-child:hover > .cardBox,
+.scrollSlider > .card:last-child:hover > .cardBox {
     transform-origin: right center;
 }
