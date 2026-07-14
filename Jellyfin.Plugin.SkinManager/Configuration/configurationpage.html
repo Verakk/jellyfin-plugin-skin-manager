@@ -750,6 +750,9 @@
                 if (skin == undefined) {
                     return;
                 }
+                // Keep the description in sync with the saved skin (it used to stay
+                // stuck on the first option's text).
+                document.getElementById("description").innerHTML = skin.description || "";
                 var count = 0;
                 for (let option of document.getElementById("cssOptions").options) {
                     if (option.value == config.selectedSkin) {
@@ -968,50 +971,207 @@
              elements and referenced the obsolete `selectedCss` field. Page init runs
              via start() (called at the end of the fontpicker.js controller). -->
 
-        <!-- ALL CSS is made and edited by @prayag17 -->
+        <!-- Modern Skin Manager configuration UI. Original CSS by @prayag17;
+             redesigned for a clean, Jellyfin-native look. Everything is scoped
+             under .pluginConfigurationPage so nothing leaks into the dashboard. -->
         <style>
-            img {
+            .pluginConfigurationPage {
+                --skm-accent: #5b7cfa;
+                --skm-accent-2: #9b5cf6;
+                --skm-surface: rgba(255, 255, 255, 0.035);
+                --skm-border: rgba(255, 255, 255, 0.10);
+                --skm-radius: 14px;
+            }
+
+            /* Center the whole page and give it room to breathe */
+            .pluginConfigurationPage .content-primary {
+                max-width: 1000px;
+                margin: 0 auto;
+                padding: 1.5em 1.25em 4em;
+            }
+
+            /* --- Header --- */
+            .pluginConfigurationPage .sectionTitleContainer {
+                gap: 0.75em;
+                margin-bottom: 0.25em;
+            }
+            .pluginConfigurationPage .sectionTitle {
+                font-size: 2.2em;
+                font-weight: 800;
+                letter-spacing: 0.2px;
+                background: linear-gradient(90deg, var(--skm-accent), var(--skm-accent-2));
+                -webkit-background-clip: text;
+                background-clip: text;
+                -webkit-text-fill-color: transparent;
+                margin: 0;
+            }
+            .pluginConfigurationPage .headerHelpButton {
+                background: var(--skm-surface) !important;
+                border: 1px solid var(--skm-border) !important;
+                border-radius: 999px !important;
+                padding: 0.35em 1.1em !important;
+                font-size: 0.85em !important;
+                min-width: 0 !important;
+            }
+            .pluginConfigurationPage .verticalSection > p {
+                color: #9aa0aa;
+                font-size: 1.05em;
+                margin: 0.4em 0 1.5em;
+            }
+
+            /* --- Skin picker --- */
+            .pluginConfigurationPage .allOptions > .selectContainer > label,
+            .pluginConfigurationPage .allOptions > .selectContainer .selectLabel {
+                font-size: 0.8em;
+                text-transform: uppercase;
+                letter-spacing: 0.12em;
+                color: var(--skm-accent);
+                font-weight: 700;
+            }
+            .pluginConfigurationPage #cssOptions {
                 width: 100%;
+                padding: 0.95em 2.6em 0.95em 1em;
+                font-size: 1.1em;
+                color: #fff;
+                background-color: #191a1f;
+                border: 1px solid var(--skm-border);
+                border-radius: var(--skm-radius);
+                appearance: none;
+                -webkit-appearance: none;
+                background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+                background-repeat: no-repeat;
+                background-position: right 1em center;
+                transition: border-color 0.2s, box-shadow 0.2s;
+                cursor: pointer;
             }
-            
-            fieldset.verticalSection.verticalSection-extrabottompadding {
-                border: 1px solid #333333;
-                border-radius: 10px;
+            .pluginConfigurationPage #cssOptions:hover {
+                border-color: rgba(255, 255, 255, 0.2);
             }
-            
-            legend {
-                font-size: 135%;
+            .pluginConfigurationPage #cssOptions:focus {
+                border-color: var(--skm-accent);
+                box-shadow: 0 0 0 3px rgba(91, 124, 250, 0.25);
+                outline: none;
             }
-            
-            .img {
+            .pluginConfigurationPage #description {
+                color: #8b909a;
+                margin: 0.6em 0.2em 0;
+                font-size: 0.98em;
+                line-height: 1.4;
+            }
+
+            /* --- Option groups (categories) --- */
+            .pluginConfigurationPage #options fieldset.verticalSection {
+                border: 1px solid var(--skm-border);
+                border-radius: var(--skm-radius);
+                background: var(--skm-surface);
+                padding: 0.75em 1.35em 1.35em;
+                margin: 1.4em 0 0;
+            }
+            .pluginConfigurationPage #options legend {
+                font-size: 1.05em;
+                font-weight: 700;
+                letter-spacing: 0.02em;
+                color: var(--skm-accent);
+                padding: 0 0.5em;
+            }
+            .pluginConfigurationPage .checkboxContainer,
+            .pluginConfigurationPage .inputContainer,
+            .pluginConfigurationPage #options .selectContainer {
+                margin: 1.1em 0 0;
+            }
+            .pluginConfigurationPage .fieldDescription {
+                color: #8b909a;
+                font-size: 0.9em;
+                line-height: 1.4;
+            }
+
+            /* --- "Set Skin" primary button --- */
+            .pluginConfigurationPage #refresh-library {
+                width: 100%;
+                margin: 1.8em 0 0.5em;
+                padding: 1.05em;
+                font-size: 1.15em;
+                font-weight: 800;
+                letter-spacing: 0.4px;
+                color: #fff;
+                border: none;
+                border-radius: var(--skm-radius);
+                background: linear-gradient(90deg, var(--skm-accent), var(--skm-accent-2));
+                box-shadow: 0 8px 24px rgba(91, 124, 250, 0.35);
+                cursor: pointer;
+                transition: transform 0.08s ease, box-shadow 0.2s ease, filter 0.2s ease;
+            }
+            .pluginConfigurationPage #refresh-library:hover {
+                filter: brightness(1.08);
+                box-shadow: 0 10px 32px rgba(91, 124, 250, 0.5);
+            }
+            .pluginConfigurationPage #refresh-library:active {
+                transform: translateY(1px);
+            }
+
+            /* --- Previews gallery (fieldsets that hold an <img>) --- */
+            .pluginConfigurationPage #options > h2.sectionTitle {
+                font-size: 1.4em;
+                font-weight: 800;
+                margin: 2.2em 0 0.5em;
+            }
+            .pluginConfigurationPage #options fieldset:has(> img) {
+                border: 1px solid var(--skm-border);
+                border-radius: var(--skm-radius);
+                background: var(--skm-surface);
+                padding: 0.6em;
+                margin: 0.9em 0;
                 overflow: hidden;
             }
-            
-            .tooltip {
+            .pluginConfigurationPage #options fieldset:has(> img) legend {
+                font-size: 0.95em;
+                font-weight: 600;
+                color: #cfd3da;
+                padding: 0 0.5em;
+            }
+            .pluginConfigurationPage img {
+                width: 100%;
+                display: block;
+                border-radius: 10px;
+            }
+            .pluginConfigurationPage .img {
+                overflow: hidden;
+                border-radius: 10px;
+            }
+
+            /* --- Tooltip (option info popovers) --- */
+            .pluginConfigurationPage .tooltip {
                 position: relative;
                 display: inline-block;
-                border-bottom: 1px dotted black;
+                margin-left: 0.35em;
+                cursor: help;
             }
-            
-            .tooltip .tooltiptext {
+            .pluginConfigurationPage .tooltip .material-icons {
+                font-size: 1.1em;
+                color: var(--skm-accent);
+                vertical-align: middle;
+            }
+            .pluginConfigurationPage .tooltip .tooltiptext {
                 visibility: hidden;
-                width: 400px;
-                background-color: transparent;
+                opacity: 0;
+                width: 380px;
+                max-width: 60vw;
                 color: #fff;
                 text-align: center;
-                border-radius: 6px;
-                padding: 5px 0;
-                /* Position the tooltip */
+                border-radius: 10px;
+                padding: 6px;
                 position: absolute;
-                z-index: 1;
+                z-index: 10;
                 top: -5px;
-                left: 105%;
+                left: 130%;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+                transition: opacity 0.15s;
             }
-            
-            .tooltip:hover .tooltiptext {
+            .pluginConfigurationPage .tooltip:hover .tooltiptext {
                 visibility: visible;
+                opacity: 1;
             }
-            
+
             input#favcolor {
                 width: 100%;
                 height: 3em !important;
@@ -1059,7 +1219,7 @@
                 line-height: 32px;
                 padding: 3px 8px 3px 8px;
                 color: #fff;
-                background: #292929 url(https://cosycorner.co.nz/wp-content/uploads/revslider/slider-1/white-down-arrow-png-2.png) no-repeat right 0.75em center/8px 9px;
+                background: #292929 url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>") no-repeat right 0.75em center/10px 10px;
                 -webkit-user-select: none;
                 -moz-user-select: none;
                 -ms-user-select: none;
