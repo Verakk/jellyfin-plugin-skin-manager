@@ -8,12 +8,12 @@
     "category": "General",
     "versions": [
       {
-        "version": "2.1.0.0",
+        "version": "2.1.1.0",
         "changelog": "Fork catalog + FOUC inliner + JellyFlix and Kaleidochromic themes; built for .NET 9 / Jellyfin 10.11.",
         "targetAbi": "10.11.0.0",
-        "sourceUrl": "https://github.com/Verakk/jellyfin-plugin-skin-manager/releases/download/v2.1.0/skin-manager-2.1.0.zip",
-        "checksum": "147acf0d74577115f48741f0d4b2fac3",
-        "timestamp": "2026-07-14T21:06:00Z"
+        "sourceUrl": "https://github.com/Verakk/jellyfin-plugin-skin-manager/releases/download/v2.1.1/skin-manager-2.1.1.zip",
+        "checksum": "c5d9e3bc4a072b4209cda668ba2cb517",
+        "timestamp": "2026-07-14T22:01:50Z"
       }
     ]
   }
