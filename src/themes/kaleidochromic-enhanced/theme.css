@@ -39,6 +39,14 @@
     height: auto !important;
     contain: layout paint style !important;
 }
+/* ...but the detail-page poster must KEEP Jellyfin's height:100%. It is sized by
+   aspect ratio, so height:auto stretches it and `cover` crops the top. Restore
+   it just for that container. */
+.detailImageContainer .cardImageContainer,
+.detailImageContainer .cardContent.cardImageContainer,
+#itemDetailPage .detailImageContainer .cardImageContainer {
+    height: 100% !important;
+}
 
 /* -----------------------------------------------------------------------------
    FIX 3 — backdrop: a filter on .itemBackdrop (which uses

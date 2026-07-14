@@ -224,6 +224,13 @@ h1, h2, h3, .sectionTitle, .pageTitle {
     height: auto !important;
     contain: layout paint style !important;
 }
+/* ...but the detail-page poster is sized by aspect ratio, so height:auto stretches
+   it and `cover` crops the top. Keep Jellyfin's height:100% just for that one. */
+.detailImageContainer .cardImageContainer,
+.detailImageContainer .cardContent.cardImageContainer,
+#itemDetailPage .detailImageContainer .cardImageContainer {
+    height: 100% !important;
+}
 
 /* Scale the whole tile (artwork + title together). This is the element
    Jellyfin itself transforms for its focus animation, so it's the safe target,
