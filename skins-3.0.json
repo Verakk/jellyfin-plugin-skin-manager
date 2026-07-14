@@ -57,7 +57,7 @@
                 "description": "How much posters lift when you hover over them.",
                 "css": "/*jfx-hover*/",
                 "selections": [
-                    { "name": "Netflix", "value": "netflix", "css": ":root{--nfx-card-hover:1.08;}" },
+                    { "name": "Netflix", "value": "netflix", "css": ":root{--nfx-card-hover:1.1;}" },
                     { "name": "Subtle", "value": "subtle", "css": ":root{--nfx-card-hover:1.05;}" },
                     { "name": "Bold", "value": "bold", "css": ":root{--nfx-card-hover:1.15;}" }
                 ]

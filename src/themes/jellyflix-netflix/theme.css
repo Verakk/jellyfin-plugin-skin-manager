@@ -38,7 +38,7 @@
     /* Shape & motion */
     --nfx-radius:         4px;
     --nfx-radius-lg:      6px;
-    --nfx-card-hover:     1.08;      /* poster lift on hover (kept modest so scaled cards aren't clipped) */
+    --nfx-card-hover:     1.1;       /* poster lift on hover (kept modest so scaled cards aren't clipped) */
     --nfx-ease:          cubic-bezier(0.25, 0.46, 0.45, 0.94);
 
     /* Typography — Netflix ships "Netflix Sans"; this is the closest free fallback stack */
@@ -407,4 +407,79 @@ input:checked + .mdl-switch__label + .mdl-switch__track ~ .mdl-switch__thumb,
     background-color: var(--nfx-surface-2);
     color: var(--nfx-text);
     border-left: 3px solid var(--nfx-red);
+}
+
+/* =============================================================================
+   v2 — stronger Home-page presence
+   The Home grid is where users first judge the theme, so push its contrast,
+   headers and hover feedback harder while staying inside the safe categories
+   (colour / shadow / transform / opacity / filter — never fixed sizes).
+   ============================================================================= */
+
+/* Bolder, tighter row headers (Netflix billboard-row feel) */
+.sectionTitle,
+.homeSectionsContainer .sectionTitle {
+    font-size: 1.5em !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.3px;
+}
+.verticalSection > .sectionTitleContainer,
+.homeSectionsContainer .verticalSection {
+    margin-bottom: 0.35em;
+}
+
+/* Cinematic poster hover: lift + brighten + soft white edge */
+.cardImageContainer {
+    transition: filter 0.28s var(--nfx-ease);
+}
+.card:hover .cardImageContainer,
+.card:focus-within .cardImageContainer {
+    filter: brightness(1.09) contrast(1.03);
+}
+.card:hover .cardScalable,
+.card:focus .cardScalable {
+    box-shadow: 0 14px 34px rgba(0, 0, 0, 0.85),
+                0 0 0 1px rgba(255, 255, 255, 0.14);
+}
+
+/* Landscape "My Media" / backdrop tiles: a gentler lift so wide cards
+   don't collide with their neighbours */
+.card.backdropCard:hover .cardScalable,
+.overflowBackdropCard:hover .cardScalable,
+.card.bannerCard:hover .cardScalable {
+    transform: scale(1.045);
+}
+
+/* Give library tile labels a cinematic drop shadow over the artwork */
+.cardText-first,
+.textActionButton {
+    text-shadow: 0 1px 6px rgba(0, 0, 0, 0.7);
+}
+
+/* Row scroll chevrons blend into the dark canvas */
+.emby-scrollbuttons-button,
+.itemsContainer ~ .emby-scrollbuttons button {
+    background: rgba(20, 20, 20, 0.55) !important;
+    color: #fff !important;
+    border-radius: var(--nfx-radius);
+}
+.emby-scrollbuttons-button:hover {
+    background: rgba(40, 40, 40, 0.8) !important;
+}
+
+/* A faint top vignette so the header always separates from bright artwork */
+.skinHeader::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0));
+    z-index: -1;
+}
+
+/* Slightly dim un-hovered cards in a hovered row for the Netflix "focus" pop.
+   Kept very subtle so nothing looks disabled. */
+.itemsContainer:hover .card:not(:hover) {
+    opacity: 0.82;
+    transition: opacity 0.25s var(--nfx-ease);
 }
