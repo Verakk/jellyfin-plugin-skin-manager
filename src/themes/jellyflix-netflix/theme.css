@@ -30,6 +30,16 @@
     --nfx-surface-2:      #242424;
     --nfx-border:         rgba(255, 255, 255, 0.12);
 
+    /* Layered depth (keeps the canvas from looking flat) */
+    --nfx-red-glow:       rgba(229, 9, 20, 0.33);
+    --nfx-canvas:         radial-gradient(135% 95% at 50% -12%, #1e1e1e 0%, #151515 42%, #0c0c0c 100%);
+    --nfx-header-grad:    linear-gradient(180deg, #0f0f0f 0%, #171717 100%);
+    --nfx-drawer-grad:    linear-gradient(180deg, #121212 0%, #090909 100%);
+    --nfx-surface-grad:   linear-gradient(180deg, #212121 0%, #171717 100%);
+    --nfx-shadow-hover:   0 16px 40px rgba(0, 0, 0, 0.9),
+                          0 0 0 1px rgba(255, 255, 255, 0.14),
+                          0 10px 30px var(--nfx-red-glow);
+
     /* Text */
     --nfx-text:           #ffffff;
     --nfx-text-dim:       #b3b3b3;
@@ -56,6 +66,16 @@ body,
     background-color: var(--nfx-bg) !important;
     color: var(--nfx-text);
     font-family: var(--nfx-font) !important;
+}
+
+/* Subtle layered canvas — a faint top-centre spotlight fading to near-black at
+   the edges, so the background reads with depth instead of a flat slab. */
+body,
+.backgroundContainer {
+    background-image: var(--nfx-canvas) !important;
+    background-attachment: fixed !important;
+    background-repeat: no-repeat !important;
+    background-size: cover !important;
 }
 
 body {
@@ -102,7 +122,7 @@ h1, h2, h3, .sectionTitle, .pageTitle {
    2. Top bar — floats over the content, goes solid on scroll (Netflix header)
    -------------------------------------------------------------------------- */
 .skinHeader {
-    background: var(--nfx-bg) !important;
+    background: var(--nfx-header-grad) !important;
     border-bottom: none;
     transition: background-color 0.35s var(--nfx-ease);
 }
@@ -142,6 +162,10 @@ h1, h2, h3, .sectionTitle, .pageTitle {
 .navMenuOption {
     background-color: var(--nfx-bg-deep) !important;
     color: var(--nfx-text);
+}
+.mainDrawer,
+.drawer {
+    background-image: var(--nfx-drawer-grad) !important;
 }
 
 .navMenuOption:hover {
@@ -183,7 +207,27 @@ h1, h2, h3, .sectionTitle, .pageTitle {
 .cardScalable {
     transition: transform 0.28s var(--nfx-ease),
                 box-shadow 0.28s var(--nfx-ease);
-    will-change: transform;
+}
+
+/* Hover overlay: a clean Netflix bottom-scrim gradient that keeps the artwork
+   visible, instead of the flat grey veil that hid the image on hover. */
+.cardOverlayContainer {
+    background: linear-gradient(to top,
+        rgba(0, 0, 0, 0.82) 0%,
+        rgba(0, 0, 0, 0.18) 45%,
+        rgba(0, 0, 0, 0) 72%) !important;
+    border-radius: var(--nfx-radius);
+}
+
+/* Centre play affordance and overlay action buttons */
+.cardOverlayFab-primary,
+.cardOverlayButton-centered {
+    background: var(--nfx-red) !important;
+    color: #fff !important;
+}
+.cardOverlayButtonIcon,
+.cardOverlayContainer .paper-icon-button-light {
+    color: #fff;
 }
 
 /* Netflix-style hover: lift the poster, add depth, bring it to the front */
@@ -193,7 +237,7 @@ h1, h2, h3, .sectionTitle, .pageTitle {
 .card:focus .cardScalable,
 .card:hover .cardScalable {
     transform: scale(var(--nfx-card-hover));
-    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.75);
+    box-shadow: var(--nfx-shadow-hover);
 }
 
 /* Card labels: dim by default, white on hover */
@@ -392,6 +436,10 @@ input:checked + .mdl-switch__label + .mdl-switch__track ~ .mdl-switch__thumb,
     color: var(--nfx-text);
     border-color: var(--nfx-border) !important;
 }
+.dialog {
+    background-image: var(--nfx-surface-grad) !important;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.72) !important;
+}
 
 .listItem:hover {
     background-color: var(--nfx-surface-2) !important;
@@ -438,8 +486,7 @@ input:checked + .mdl-switch__label + .mdl-switch__track ~ .mdl-switch__thumb,
 }
 .card:hover .cardScalable,
 .card:focus .cardScalable {
-    box-shadow: 0 14px 34px rgba(0, 0, 0, 0.85),
-                0 0 0 1px rgba(255, 255, 255, 0.14);
+    box-shadow: var(--nfx-shadow-hover);
 }
 
 /* Landscape "My Media" / backdrop tiles: a gentler lift so wide cards
