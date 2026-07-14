@@ -50,7 +50,7 @@
     /* Shape & motion */
     --nfx-radius:         4px;
     --nfx-radius-lg:      6px;
-    --nfx-card-hover:     1.22;      /* carousel-style hover lift (rows get extra vertical room below so it isn't clipped) */
+    --nfx-card-hover:     1.1;       /* clean zoom of the same artwork — kept small enough not to be clipped by Jellyfin's scroll rows */
     --nfx-ease:          cubic-bezier(0.25, 0.46, 0.45, 0.94);
 
     /* Typography — Netflix ships "Netflix Sans"; this is the closest free fallback stack */
@@ -70,14 +70,13 @@ body,
     font-family: var(--nfx-font) !important;
 }
 
-/* Subtle layered canvas — a faint top-centre spotlight fading to near-black at
-   the edges, so the background reads with depth instead of a flat slab. */
+/* Flat Netflix-black canvas — clean and uniform, no gradient. Force off any
+   inherited/background layering so the page reads as a single dark slab. */
 body,
-.backgroundContainer {
-    background-image: var(--nfx-canvas) !important;
-    background-attachment: fixed !important;
-    background-repeat: no-repeat !important;
-    background-size: cover !important;
+.backgroundContainer,
+.mainAnimatedPages {
+    background-image: none !important;
+    background-color: var(--nfx-bg) !important;
 }
 
 body {
@@ -203,7 +202,9 @@ h1, h2, h3, .sectionTitle, .pageTitle {
 }
 
 .cardImageContainer {
-    background-color: var(--nfx-surface);
+    /* Near-black fallback so a missing thumbnail blends into the canvas
+       instead of showing a jarring grey box. */
+    background-color: #0d0d0d;
 }
 
 .cardScalable {
@@ -496,7 +497,7 @@ input:checked + .mdl-switch__label + .mdl-switch__track ~ .mdl-switch__thumb,
 .card.backdropCard:hover .cardScalable,
 .overflowBackdropCard:hover .cardScalable,
 .card.bannerCard:hover .cardScalable {
-    transform: scale(1.12);
+    transform: scale(1.07);
 }
 
 /* Give library tile labels a cinematic drop shadow over the artwork */
@@ -552,8 +553,8 @@ input:checked + .mdl-switch__label + .mdl-switch__track ~ .mdl-switch__thumb,
    somewhere to expand into instead of being cut off by the scroll box. */
 .itemsContainer.scrollSlider,
 .scrollSlider {
-    padding-top: 26px;
-    padding-bottom: 26px;
+    padding-top: 15px;
+    padding-bottom: 15px;
 }
 
 /* Edge posters grow inward so they never spill off the screen */
