@@ -211,21 +211,22 @@ h1, h2, h3, .sectionTitle, .pageTitle {
 
 /* Hover overlay: a clean Netflix bottom-scrim gradient that keeps the artwork
    visible, instead of the flat grey veil that hid the image on hover. */
+/* Jellyfin's default hover overlay is a full-card 50% black scrim
+   (.cardOverlayContainer{background:rgba(0,0,0,.5)}) laid over the artwork.
+   Reduce it to a faint bottom-only gradient — enough for the corner buttons to
+   stay legible, without darkening the poster. */
 .cardOverlayContainer {
     background: linear-gradient(to top,
-        rgba(0, 0, 0, 0.7) 0%,
-        rgba(0, 0, 0, 0) 42%) !important;
+        rgba(0, 0, 0, 0.6) 0%,
+        rgba(0, 0, 0, 0) 35%) !important;
     border-radius: var(--nfx-radius);
 }
 
-/* Keep the artwork fully visible on hover — the overlay must never hide it */
-.card:hover .cardImageContainer,
-.card:focus-within .cardImageContainer,
-.card:hover .cardImage,
-.card:hover .cardImageContainer > img,
-.card:hover .cardImageContainer[style*="background-image"] {
-    opacity: 1 !important;
-    visibility: visible !important;
+/* Jellyfin's aspect-ratio spacer is grey (#242424) and shows through anywhere
+   the artwork doesn't cover; blend it into the black canvas. */
+.cardPadder,
+.cardBox:not(.visualCardBox) .cardPadder {
+    background-color: transparent !important;
 }
 
 /* Centre play affordance and overlay action buttons */
@@ -485,14 +486,11 @@ input:checked + .mdl-switch__label + .mdl-switch__track ~ .mdl-switch__thumb,
     margin-bottom: 0.35em;
 }
 
-/* Cinematic poster hover: lift + brighten + soft white edge */
-.cardImageContainer {
-    transition: filter 0.28s var(--nfx-ease);
-}
-.card:hover .cardImageContainer,
-.card:focus-within .cardImageContainer {
-    filter: brightness(1.12) contrast(1.05);
-}
+/* Cinematic poster hover: lift + soft edge (NO filter — see note below) */
+/* ROOT CAUSE of "the photo disappears / goes black on hover": Jellyfin sets
+   `contain: strict` on .cardImageContainer, and a CSS filter on that element
+   can stop its background-image (the artwork) from painting on hover, revealing
+   the background-colour underneath. So we deliberately apply NO filter here. */
 .card:hover .cardScalable,
 .card:focus .cardScalable {
     box-shadow: var(--nfx-shadow-hover);
