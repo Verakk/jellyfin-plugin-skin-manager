@@ -72,21 +72,32 @@
 }
 
 /* -----------------------------------------------------------------------------
-   FIX 4 — "blue shadow": Kaleidochromic tints the whole background with the blue
-   accent (`.backgroundContainer { background-color: rgba(var(--accent),0.17) }`),
-   which reads as a blue haze over the backdrop. Make it transparent.
+   FIX 4 — keep Kaleidochromic's IDENTITY colour. (An earlier revision made
+   .backgroundContainer transparent, which turned the whole app plain black and
+   lost the theme's signature dark-navy tint. The imported original already sets
+   `rgba(var(--accent), 0.17)` there — we simply no longer override it.)
    -------------------------------------------------------------------------- */
-.backgroundContainer {
-    background-color: transparent !important;
-}
 
 /* -----------------------------------------------------------------------------
-   FIX 5 — "image completely cut off" on narrow / mobile detail pages:
-   Monochromic (the base) makes .itemBackdrop a full-screen FIXED blur below 32em
-   and pushes the wrapper down, which fights Jellyfin 10.11's redesigned mobile
-   detail layout and crops the poster. Restore normal in-flow backdrop there.
-   (Desktop is left untouched.)
+   FIX 5 — "poster/thumbnail cropped at the top" on detail pages.
+   Monochromic was written for the pre-10.8 detail layout: it HIDES the hero
+   (.itemBackdrop { display:none } at ≥32em) and pushes .detailRibbon down 13vh.
+   But Jellyfin 10.11 positions the poster card with `top: -12.96em` relative to
+   that ribbon — with Mono's offsets the card lands underneath the fixed header
+   and gets clipped. Restore the stock 10.11 hero + ribbon geometry (this is the
+   layout that already renders correctly on this server).
    -------------------------------------------------------------------------- */
+@media all and (min-width: 32em) {
+    .itemBackdrop {
+        display: block !important;
+    }
+    .layout-desktop .detailRibbon {
+        margin-top: -7.2em !important;
+        height: 7.2em !important;
+    }
+}
+/* ...and below 32em, undo Mono's full-screen fixed backdrop + wrapper offset,
+   which fights 10.11's mobile detail layout and crops the poster. */
 @media all and (max-width: 32em) {
     .itemBackdrop {
         position: relative !important;
@@ -96,4 +107,29 @@
     .detailPageWrapperContainer {
         margin-top: 0 !important;
     }
+}
+
+/* -----------------------------------------------------------------------------
+   FIX 6 — pastel bands beside episode thumbnails. When an episode has no
+   landscape thumb, Jellyfin drops the portrait poster in uncropped
+   (.coveredImage-contain { background-size: contain }) and blurhash fills the
+   sides — that's the lavender/beige band. Crop to fill instead, Netflix-style.
+   Scoped to wide cards only so logos/squares that legitimately use contain are
+   untouched.
+   -------------------------------------------------------------------------- */
+.backdropCard .cardImageContainer.coveredImage-contain,
+.overflowBackdropCard .cardImageContainer.coveredImage-contain,
+.smallBackdropCard .cardImageContainer.coveredImage-contain {
+    background-size: cover !important;
+    background-position: center 25% !important;
+}
+
+/* -----------------------------------------------------------------------------
+   FIX 7 — the full-page blurred backdrop looked like a bug: Kaleidochromic uses
+   blur(18px) + brightness(40%), which on big screens reads as huge, bright,
+   half-sharp faces behind the UI. Soften and darken it so it becomes ambience
+   instead of a poster photobombing the page.
+   -------------------------------------------------------------------------- */
+.backdropImage {
+    filter: blur(42px) saturate(160%) contrast(120%) brightness(27%) !important;
 }
