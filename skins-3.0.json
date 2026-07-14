@@ -26,6 +26,47 @@
     }]
 },
 {
+    "name": "JellyFlix — Netflix Edition",
+    "author": "Verakk",
+    "description": "A Netflix-inspired theme: pure black canvas, signature red accents, billboard-style detail pages and poster rows that lift on hover. Self-contained and flicker-free. Tune the accent colour, corner rounding and hover zoom below.",
+    "categories": [{
+        "name": "JellyFlix",
+        "options": [
+            {
+                "type": "colorPicker",
+                "name": "Accent color",
+                "description": "Main highlight colour used for buttons, active menu items and progress bars.",
+                "mode": "hex",
+                "default": "#e50914",
+                "css": ":root{--nfx-red:$ !important;--nfx-red-hover:$ !important;--nfx-red-press:$ !important;}"
+            },
+            {
+                "type": "selector",
+                "name": "Corner rounding",
+                "description": "Roundness of posters, cards and inputs.",
+                "css": "/*jfx-rounding*/",
+                "selections": [
+                    { "name": "Default", "value": "default", "css": ":root{--nfx-radius:4px;--nfx-radius-lg:6px;}" },
+                    { "name": "Sharp (Netflix)", "value": "sharp", "css": ":root{--nfx-radius:0px;--nfx-radius-lg:2px;}" },
+                    { "name": "Rounded", "value": "rounded", "css": ":root{--nfx-radius:10px;--nfx-radius-lg:14px;}" }
+                ]
+            },
+            {
+                "type": "selector",
+                "name": "Hover zoom",
+                "description": "How much posters lift when you hover over them.",
+                "css": "/*jfx-hover*/",
+                "selections": [
+                    { "name": "Netflix", "value": "netflix", "css": ":root{--nfx-card-hover:1.08;}" },
+                    { "name": "Subtle", "value": "subtle", "css": ":root{--nfx-card-hover:1.05;}" },
+                    { "name": "Bold", "value": "bold", "css": ":root{--nfx-card-hover:1.15;}" }
+                ]
+            }
+        ]
+    }],
+    "defaultCss": "@import url('https://cdn.jsdelivr.net/gh/Verakk/jellyfin-plugin-skin-manager@master/src/themes/jellyflix-netflix/theme.css');"
+},
+{
     "name": "JellySkin",
     "author": "prayagprajapati17",
     "description": "A very bright and colorful look using lots of drop shadows. Theme is by prayag17.",

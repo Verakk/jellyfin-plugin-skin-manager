@@ -1,0 +1,410 @@
+/* =============================================================================
+   JellyFlix — a Netflix-inspired theme for Jellyfin 10.10
+   -----------------------------------------------------------------------------
+   Self-contained: no remote @import, no external fonts. Everything below is
+   plain CSS so the Skin Manager can inline it into Jellyfin's CustomCss and the
+   applied skin never flashes unstyled on navigation.
+
+   Design goals:
+     - Pure Netflix black canvas (#141414) with the signature red (#E50914).
+     - Billboard-style detail hero that fades into the page background.
+     - Poster rows with a subtle "lift + glow" hover, Netflix-style.
+     - A top bar that floats over content and turns solid once scrolled.
+
+   Everything tunable lives in the :root variables. Change a value there rather
+   than hunting through the rules. Selectors are intentionally scoped to colour,
+   background, shadow, radius, font and hover transforms only — never fixed
+   heights or positions — so page structure and text flow stay intact.
+   ============================================================================= */
+
+:root {
+    /* Brand */
+    --nfx-red:            #e50914;
+    --nfx-red-hover:      #f6121d;
+    --nfx-red-press:      #b1060f;
+
+    /* Surfaces */
+    --nfx-bg:             #141414;
+    --nfx-bg-deep:        #0b0b0b;
+    --nfx-surface:        #1c1c1c;
+    --nfx-surface-2:      #242424;
+    --nfx-border:         rgba(255, 255, 255, 0.12);
+
+    /* Text */
+    --nfx-text:           #ffffff;
+    --nfx-text-dim:       #b3b3b3;
+    --nfx-text-faint:     #808080;
+
+    /* Shape & motion */
+    --nfx-radius:         4px;
+    --nfx-radius-lg:      6px;
+    --nfx-card-hover:     1.08;      /* poster lift on hover (kept modest so scaled cards aren't clipped) */
+    --nfx-ease:          cubic-bezier(0.25, 0.46, 0.45, 0.94);
+
+    /* Typography — Netflix ships "Netflix Sans"; this is the closest free fallback stack */
+    --nfx-font: "Helvetica Neue", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+/* -----------------------------------------------------------------------------
+   1. Global canvas & typography
+   -------------------------------------------------------------------------- */
+html,
+body,
+.backgroundContainer,
+.mainAnimatedPages,
+.dashboardDocument {
+    background-color: var(--nfx-bg) !important;
+    color: var(--nfx-text);
+    font-family: var(--nfx-font) !important;
+}
+
+body {
+    -webkit-font-smoothing: antialiased;
+    letter-spacing: 0.1px;
+}
+
+/* Kill the default light blue accent Jellyfin uses everywhere */
+.button-link,
+a[data-role],
+.emby-button.link-button,
+.sectionTitleTextButton {
+    color: var(--nfx-text);
+}
+
+h1, h2, h3, .sectionTitle, .pageTitle {
+    font-family: var(--nfx-font) !important;
+    font-weight: 700;
+    color: var(--nfx-text);
+    letter-spacing: 0.2px;
+}
+
+.sectionTitle {
+    font-size: 1.35em;
+}
+
+/* Slim, dark scrollbars to match the canvas */
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+::-webkit-scrollbar-thumb {
+    background: #333;
+    border-radius: 8px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+/* -----------------------------------------------------------------------------
+   2. Top bar — floats over the content, goes solid on scroll (Netflix header)
+   -------------------------------------------------------------------------- */
+.skinHeader {
+    background: var(--nfx-bg) !important;
+    border-bottom: none;
+    transition: background-color 0.35s var(--nfx-ease);
+}
+
+/* Jellyfin adds this variant while the page is scrolled to the very top:
+   let the header fade into a top-down gradient so backdrops bleed through. */
+.skinHeader.semiTransparent,
+.skinHeader-withBackground.semiTransparent {
+    background: linear-gradient(180deg,
+        rgba(0, 0, 0, 0.85) 0%,
+        rgba(0, 0, 0, 0.55) 45%,
+        rgba(0, 0, 0, 0) 100%) !important;
+}
+
+.headerButton,
+.headerButton-flat,
+.headerTabs .emby-tab-button {
+    color: var(--nfx-text);
+}
+
+/* Active top tab underline in Netflix red */
+.emby-tab-button-active,
+.emby-tab-button.is-active {
+    color: var(--nfx-text) !important;
+}
+.emby-tabs-slider ~ .emby-tab-buttons-slider,
+.emby-tab-button-active + .emby-tab-buttons-slider,
+.emby-tabs .emby-tab-buttons-slider {
+    background-color: var(--nfx-red) !important;
+}
+
+/* -----------------------------------------------------------------------------
+   3. Side drawer (main menu)
+   -------------------------------------------------------------------------- */
+.mainDrawer,
+.drawer,
+.navMenuOption {
+    background-color: var(--nfx-bg-deep) !important;
+    color: var(--nfx-text);
+}
+
+.navMenuOption:hover {
+    background-color: var(--nfx-surface) !important;
+}
+
+/* Selected menu entry gets a red rail */
+.navMenuOption-selected {
+    background-color: var(--nfx-surface) !important;
+    box-shadow: inset 4px 0 0 0 var(--nfx-red);
+}
+
+.navMenuOptionIcon {
+    color: var(--nfx-text-dim);
+}
+.navMenuOption-selected .navMenuOptionIcon {
+    color: var(--nfx-red);
+}
+
+/* -----------------------------------------------------------------------------
+   4. Poster cards & rows — the "lift + glow" hover
+   -------------------------------------------------------------------------- */
+.card {
+    /* let the scaled card breathe instead of being clipped by the neighbour */
+    z-index: 1;
+}
+
+.cardImageContainer,
+.cardImage,
+.cardOverlayContainer,
+.cardScalable {
+    border-radius: var(--nfx-radius);
+}
+
+.cardImageContainer {
+    background-color: var(--nfx-surface);
+}
+
+.cardScalable {
+    transition: transform 0.28s var(--nfx-ease),
+                box-shadow 0.28s var(--nfx-ease);
+    will-change: transform;
+}
+
+/* Netflix-style hover: lift the poster, add depth, bring it to the front */
+.card:hover {
+    z-index: 30;
+}
+.card:focus .cardScalable,
+.card:hover .cardScalable {
+    transform: scale(var(--nfx-card-hover));
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.75);
+}
+
+/* Card labels: dim by default, white on hover */
+.cardText {
+    color: var(--nfx-text-dim);
+}
+.cardText-first {
+    color: var(--nfx-text);
+    font-weight: 600;
+}
+.card:hover .cardText {
+    color: var(--nfx-text);
+}
+
+/* Progress bar on "continue watching" cards */
+.itemProgressBarForeground {
+    background-color: var(--nfx-red) !important;
+}
+.itemProgressBar {
+    background-color: rgba(255, 255, 255, 0.25);
+}
+
+/* -----------------------------------------------------------------------------
+   5. Buttons
+   -------------------------------------------------------------------------- */
+.button-submit,
+.raised.button-submit,
+.btnPlay,
+.fab,
+.button-submit.emby-button {
+    background: var(--nfx-red) !important;
+    color: var(--nfx-text) !important;
+    border-radius: var(--nfx-radius);
+    transition: background-color 0.2s var(--nfx-ease), transform 0.1s var(--nfx-ease);
+}
+.button-submit:hover,
+.raised.button-submit:hover,
+.btnPlay:hover,
+.fab:hover {
+    background: var(--nfx-red-hover) !important;
+}
+.button-submit:active,
+.raised.button-submit:active {
+    background: var(--nfx-red-press) !important;
+    transform: translateY(1px);
+}
+
+/* Secondary / flat buttons: translucent white like Netflix's "More Info" */
+.detailButton,
+.raised:not(.button-submit) {
+    background: rgba(109, 109, 110, 0.5) !important;
+    color: var(--nfx-text) !important;
+    border-radius: var(--nfx-radius);
+}
+.detailButton:hover,
+.raised:not(.button-submit):hover {
+    background: rgba(109, 109, 110, 0.7) !important;
+}
+
+/* Round icon action buttons on the detail page */
+.detailButton-icon {
+    color: var(--nfx-text);
+}
+
+/* -----------------------------------------------------------------------------
+   6. Detail page — the billboard hero
+   -------------------------------------------------------------------------- */
+.detailPageWrapperContainer,
+.detailPageContent {
+    background-color: var(--nfx-bg) !important;
+}
+
+/* Big backdrop that fades into the page on the bottom and the left,
+   the way the Netflix title billboard does. */
+.itemBackdrop {
+    -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 35%, transparent 100%);
+    mask-image: linear-gradient(180deg, #000 0%, #000 35%, transparent 100%);
+}
+.detailRibbon {
+    background: linear-gradient(180deg, rgba(20, 20, 20, 0) 0%, var(--nfx-bg) 100%) !important;
+}
+
+.itemName,
+.detailPagePrimaryContent .itemName-primary {
+    font-weight: 800;
+    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.8);
+}
+
+.mediaInfoItem,
+.itemMiscInfo {
+    color: var(--nfx-text-dim);
+}
+
+/* Rating / star icons keep their meaning but sit on the dim palette */
+.starRatingButton .material-icons {
+    color: #f5c518;
+}
+
+/* -----------------------------------------------------------------------------
+   7. Login page
+   -------------------------------------------------------------------------- */
+#loginPage,
+.loginPage {
+    background-color: var(--nfx-bg-deep);
+}
+
+.manualLoginForm,
+.readOnlyContent,
+.loginForm {
+    background: rgba(0, 0, 0, 0.72);
+    border-radius: var(--nfx-radius-lg);
+    padding: 2em 1.75em;
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.6);
+}
+
+/* User selection avatars get a red ring on hover */
+.sessionUserImage,
+.cardImageContainer.coveredImage {
+    border-radius: var(--nfx-radius);
+}
+.card.userCard:hover .cardImageContainer {
+    box-shadow: 0 0 0 3px var(--nfx-red);
+}
+
+/* -----------------------------------------------------------------------------
+   8. Inputs, selects & textareas
+   -------------------------------------------------------------------------- */
+.emby-input,
+.emby-textarea,
+.emby-select,
+.textarea-mono {
+    background-color: var(--nfx-surface) !important;
+    color: var(--nfx-text) !important;
+    border: 1px solid var(--nfx-border) !important;
+    border-radius: var(--nfx-radius);
+    transition: border-color 0.2s var(--nfx-ease);
+}
+.emby-input:focus,
+.emby-textarea:focus,
+.emby-select:focus {
+    border-color: var(--nfx-red) !important;
+    outline: none;
+}
+
+.inputLabel,
+.selectLabel,
+.textareaLabel,
+.fieldDescription {
+    color: var(--nfx-text-dim);
+}
+
+/* Checkboxes & toggles in red */
+.checkboxOutline,
+.emby-checkbox:checked + span + .checkboxOutline {
+    border-color: var(--nfx-red);
+}
+.emby-checkbox:checked + span .checkboxIcon-checked,
+.checkboxIcon-checked {
+    color: var(--nfx-red);
+}
+.mdl-switch__thumb {
+    background: #fff;
+}
+input:checked + .mdl-switch__label + .mdl-switch__track ~ .mdl-switch__thumb,
+.mdl-switch.is-checked .mdl-switch__thumb {
+    background: var(--nfx-red);
+}
+
+/* Sliders (volume, seek, settings) */
+.mdl-slider::-webkit-slider-thumb,
+.emby-slider-background-lower {
+    background-color: var(--nfx-red) !important;
+}
+
+/* -----------------------------------------------------------------------------
+   9. Video player OSD
+   -------------------------------------------------------------------------- */
+.osdHeader,
+.videoOsdBottom {
+    background: linear-gradient(0deg, rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0)) !important;
+}
+.osdProgressInner,
+.sliderBubble {
+    background-color: var(--nfx-red) !important;
+}
+
+/* -----------------------------------------------------------------------------
+   10. Misc surfaces (dialogs, cards backgrounds, list rows)
+   -------------------------------------------------------------------------- */
+.dialog,
+.formDialogHeader,
+.formDialogFooter,
+.paperList,
+.listItem-border {
+    background-color: var(--nfx-surface) !important;
+    color: var(--nfx-text);
+    border-color: var(--nfx-border) !important;
+}
+
+.listItem:hover {
+    background-color: var(--nfx-surface-2) !important;
+}
+
+/* Section "see all" chevrons and misc accents */
+.emby-button.sectionTitleTextButton:hover {
+    color: var(--nfx-red);
+}
+
+/* Toast / snackbar */
+.toast {
+    background-color: var(--nfx-surface-2);
+    color: var(--nfx-text);
+    border-left: 3px solid var(--nfx-red);
+}

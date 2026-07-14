@@ -47,7 +47,7 @@
 
                 Dashboard.showLoadingMsg();
                 $.getJSON(
-                    "https://raw.githubusercontent.com/danieladov/jellyfin-plugin-skin-manager/master/skins-3.0.json",
+                    "https://raw.githubusercontent.com/Verakk/jellyfin-plugin-skin-manager/master/skins-3.0.json",
                     function(json) {
                         $.getJSON(
                             "https://www.googleapis.com/webfonts/v1/webfonts?sort=popularity&key=AIzaSyB_bPGsf0vxnpO9GmkBjeoEIQ7rE9rbNck",
@@ -179,7 +179,7 @@
                 var description = option.description;
                 var mode = option.mode;
                 html +=
-                    '<div class="inputContainer"><label></span>' +
+                    '<div class="inputContainer"><label>' +
                     getToolTip(option) +
                     '</label><input class = color type=text  value="' +
                     defaultValue +
@@ -338,7 +338,7 @@
                     '<div class="inputContainer"><label><span>' + name + '</span></label><input type="range" class="slider" value="' + defaultValue + '" oninput ="updateBlur(' + "'" + id + "'" + ')"' + 'step="' + step + '" data-css="' + css + '" id="' + id + '" name="' + id + '" min="0" max="40" label="' + name + '">' +
                     '<div class="fieldDescription">' + description + '</div>' +
                     '</div>' +
-                    '<div class="img"><img id="' + id + 'image"' + 'src="https://i.imgur.com/sMDQSdV.png"></div>';
+                    '<div class="img"><img id="' + id + 'image" ' + 'src="https://cdn.jsdelivr.net/gh/Verakk/jellyfin-plugin-skin-manager@master/src/img/Monochromic/login.jpg"></div>';
                 return html;
             }
 
@@ -426,9 +426,6 @@
                 }
 
                 //process colorPicker
-                selectedOptions.forEach((element) => {
-                    css += element + "\n";
-                });
                 var inputs = document.getElementsByClassName("color");
                 for (var i = 0; i < inputs.length; i++) {
                     var element = inputs[i]
@@ -496,6 +493,97 @@
 
             function checkForImport(css){
                 return css.includes("@import")
+            }
+
+            // Resolves @import statements by fetching the remote CSS and inlining it into
+            // the string that gets written to Jellyfin's branding CustomCss. Doing this at
+            // "Set Skin" time (instead of leaving a remote @import in CustomCss) removes the
+            // flash-of-unstyled-content that used to appear on every page navigation, because
+            // the browser no longer has to fetch the stylesheet after the page has rendered.
+            // Any fetch that fails is left as its original @import so no skin can break.
+            async function inlineImports(css, depth, seen) {
+                depth = depth || 0;
+                seen = seen || {};
+                if (depth > 4) {
+                    return css; // safety cap against deep/looping import chains
+                }
+
+                var importRegex = /@import\s+(?:url\(\s*)?(['"]?)([^'")\s]+)\1\s*\)?\s*([^;]*);/gi;
+                var matches = [];
+                var m;
+                while ((m = importRegex.exec(css)) !== null) {
+                    matches.push({ full: m[0], url: m[2], media: (m[3] || "").trim() });
+                }
+
+                for (var i = 0; i < matches.length; i++) {
+                    var item = matches[i];
+                    // Leave media-scoped imports (e.g. "@import url(x) screen;") untouched to
+                    // preserve their conditional semantics.
+                    if (item.media) {
+                        continue;
+                    }
+                    var absUrl;
+                    try {
+                        absUrl = new URL(item.url, window.location.href).href;
+                    } catch (e) {
+                        continue;
+                    }
+                    if (seen[absUrl]) {
+                        css = replaceOnce(css, item.full, ""); // drop duplicate/cyclic import
+                        continue;
+                    }
+                    try {
+                        var resp = await fetch(absUrl);
+                        if (!resp.ok) {
+                            continue; // keep original @import as a fallback
+                        }
+                        var text = await resp.text();
+                        seen[absUrl] = true;
+                        text = rewriteRelativeUrls(text, absUrl);
+                        text = await inlineImports(text, depth + 1, seen);
+                        css = replaceOnce(css, item.full, text);
+                    } catch (e) {
+                        console.warn("SkinManager: could not inline import, leaving @import in place:", absUrl, e);
+                    }
+                }
+                return css;
+            }
+
+            // String replace of the first literal occurrence, without treating $ sequences in
+            // the replacement as special (fetched CSS may legitimately contain them).
+            function replaceOnce(haystack, needle, replacement) {
+                var idx = haystack.indexOf(needle);
+                if (idx === -1) {
+                    return haystack;
+                }
+                return haystack.slice(0, idx) + replacement + haystack.slice(idx + needle.length);
+            }
+
+            // Rewrites relative url(...) and @import references inside fetched CSS to absolute
+            // URLs, so the inlined rules keep resolving their assets correctly.
+            function rewriteRelativeUrls(css, baseUrl) {
+                css = css.replace(/url\(\s*(['"]?)([^'")]+)\1\s*\)/gi, function(match, quote, ref) {
+                    var trimmed = ref.trim();
+                    if (/^(data:|https?:|\/\/|#)/i.test(trimmed)) {
+                        return match;
+                    }
+                    try {
+                        return "url(" + new URL(trimmed, baseUrl).href + ")";
+                    } catch (e) {
+                        return match;
+                    }
+                });
+                css = css.replace(/@import\s+(['"])([^'"]+)\1/gi, function(match, quote, ref) {
+                    if (/^(https?:|\/\/)/i.test(ref)) {
+                        return match;
+                    }
+                    try {
+                        return '@import "' + new URL(ref, baseUrl).href + '"';
+                    } catch (e) {
+                        return match;
+                    }
+                });
+                return css;
             }
 
 
@@ -646,8 +734,7 @@
                     config = savedConfig;
 
                     if (!config) {
-                        config.selectedSkin = "";
-                        config.options = [];
+                        config = { selectedSkin: "", options: [] };
                     }
                     loadSavedOptions();
                 });
@@ -844,9 +931,10 @@
                         ApiClient.getNamedConfiguration("branding").then(async function(
                             brandingConfig
                         ) {
-                            createCss().then(r => {
-                                console.log("despues de then")
-                                brandingConfig.CustomCss = r;
+                            createCss().then(async function(r) {
+                                // Inline remote @import rules so the applied skin no longer
+                                // flashes unstyled on each navigation (FOUC).
+                                brandingConfig.CustomCss = await inlineImports(r);
                                 ApiClient.updateNamedConfiguration(
                                     "branding",
                                     brandingConfig
@@ -876,30 +964,10 @@
                     null;
             }
         </script>
-        <script type="text/javascript">
-            var plugin = {
-                guid: "e9ca8b8e-ca6d-40e7-85dc-58e536df8eb3",
-            };
-            $("#configPage").on("pageshow", function() {
-                Dashboard.showLoadingMsg();
-                ApiClient.getPluginConfiguration(plugin.guid).then(function(config) {
-                    $("#cssOptions").val(config.selectedCss).change();
-                    Dashboard.hideLoadingMsg();
-                });
-            });
-            $("#configForm").on("submit", function() {
-                Dashboard.showLoadingMsg();
-                ApiClient.getPluginConfiguration(plugin.guid).then(function(config) {
-                    config.selectedCss = $("#cssOptions").val();
-                    ApiClient.updatePluginConfiguration(plugin.guid, config).then(
-                        function(result) {
-                            Dashboard.processPluginConfigurationUpdateResult(result);
-                        }
-                    );
-                });
-                return false;
-            });
-        </script>
+        <!-- Removed dead handlers that targeted non-existent #configPage / #configForm
+             elements and referenced the obsolete `selectedCss` field. Page init runs
+             via start() (called at the end of the fontpicker.js controller). -->
+
         <!-- ALL CSS is made and edited by @prayag17 -->
         <style>
             img {
