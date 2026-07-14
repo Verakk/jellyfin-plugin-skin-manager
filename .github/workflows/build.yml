@@ -1,4 +1,4 @@
-name: Build plugin
+name: Build & release plugin
 
 on:
   push:
@@ -7,6 +7,9 @@ on:
       - 'Jellyfin.Plugin.SkinManager/**'
       - '.github/workflows/build.yml'
   workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   build:
@@ -20,15 +23,73 @@ jobs:
         with:
           dotnet-version: '9.0.x'
 
+      - name: Read version from csproj
+        id: ver
+        run: echo "version=$(grep -oPm1 '(?<=<AssemblyVersion>)[^<]+' Jellyfin.Plugin.SkinManager/Jellyfin.Plugin.SkinManager.csproj)" >> "$GITHUB_OUTPUT"
+
       - name: Publish
         run: >-
           dotnet publish Jellyfin.Plugin.SkinManager/Jellyfin.Plugin.SkinManager.csproj
           --configuration Release
           --output publish
 
-      - name: Upload plugin DLL
+      - name: Package zip + checksum
+        id: pkg
+        run: |
+          VERSION="${{ steps.ver.outputs.version }}"
+          ASSET="skin-manager-${VERSION}.zip"
+          mkdir -p pkg
+          cp publish/Jellyfin.Plugin.SkinManager.dll pkg/
+          (cd pkg && zip -r "../${ASSET}" .)
+          CHECKSUM=$(md5sum "${ASSET}" | cut -d' ' -f1)
+          echo "asset=${ASSET}" >> "$GITHUB_OUTPUT"
+          echo "checksum=${CHECKSUM}" >> "$GITHUB_OUTPUT"
+          echo "timestamp=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$GITHUB_OUTPUT"
+
+      - name: Upload DLL artifact (for manual install too)
         uses: actions/upload-artifact@v4
         with:
           name: Jellyfin.Plugin.SkinManager
           path: publish/Jellyfin.Plugin.SkinManager.dll
           if-no-files-found: error
+
+      - name: Create / update GitHub release
+        if: github.ref == 'refs/heads/master'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.ver.outputs.version }}
+          name: Skin Manager v${{ steps.ver.outputs.version }}
+          files: ${{ steps.pkg.outputs.asset }}
+
+      - name: Generate & commit manifest.json
+        if: github.ref == 'refs/heads/master'
+        run: |
+          VERSION="${{ steps.ver.outputs.version }}"
+          URL="https://github.com/${{ github.repository }}/releases/download/v${VERSION}/${{ steps.pkg.outputs.asset }}"
+          cat > manifest.json <<EOF
+          [
+            {
+              "guid": "e9ca8b8e-ca6d-40e7-85dc-58e536df8eb3",
+              "name": "Skin Manager",
+              "description": "Download and install skins for Jellyfin (enhanced fork).",
+              "overview": "Browse, configure and apply CSS skins.",
+              "owner": "Verakk",
+              "category": "General",
+              "versions": [
+                {
+                  "version": "${VERSION}.0",
+                  "changelog": "Fork catalog + FOUC inliner + JellyFlix and Kaleidochromic themes; built for .NET 9 / Jellyfin 10.11.",
+                  "targetAbi": "10.11.0.0",
+                  "sourceUrl": "${URL}",
+                  "checksum": "${{ steps.pkg.outputs.checksum }}",
+                  "timestamp": "${{ steps.pkg.outputs.timestamp }}"
+                }
+              ]
+            }
+          ]
+          EOF
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add manifest.json
+          git commit -m "ci: update manifest.json for v${VERSION}" || echo "manifest unchanged"
+          git push
