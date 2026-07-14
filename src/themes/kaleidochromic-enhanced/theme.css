@@ -70,3 +70,30 @@
 .cardBox:not(.visualCardBox) .cardPadder {
     background-color: transparent !important;
 }
+
+/* -----------------------------------------------------------------------------
+   FIX 4 — "blue shadow": Kaleidochromic tints the whole background with the blue
+   accent (`.backgroundContainer { background-color: rgba(var(--accent),0.17) }`),
+   which reads as a blue haze over the backdrop. Make it transparent.
+   -------------------------------------------------------------------------- */
+.backgroundContainer {
+    background-color: transparent !important;
+}
+
+/* -----------------------------------------------------------------------------
+   FIX 5 — "image completely cut off" on narrow / mobile detail pages:
+   Monochromic (the base) makes .itemBackdrop a full-screen FIXED blur below 32em
+   and pushes the wrapper down, which fights Jellyfin 10.11's redesigned mobile
+   detail layout and crops the poster. Restore normal in-flow backdrop there.
+   (Desktop is left untouched.)
+   -------------------------------------------------------------------------- */
+@media all and (max-width: 32em) {
+    .itemBackdrop {
+        position: relative !important;
+        width: 100% !important;
+        height: 40vh !important;
+    }
+    .detailPageWrapperContainer {
+        margin-top: 0 !important;
+    }
+}
