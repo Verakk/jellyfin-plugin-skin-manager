@@ -67,6 +67,36 @@
     "defaultCss": "@import url('https://cdn.jsdelivr.net/gh/Verakk/jellyfin-plugin-skin-manager@master/src/themes/jellyflix-netflix/theme.css');"
 },
 {
+    "name": "Kaleidochromic (Enhanced)",
+    "author": "CTalvio · fixes by Verakk",
+    "description": "The Kaleidochromic theme by CTalvio/EdgeMentality, with Jellyfin 10.10 fixes: no more flashing/fading card artwork and no more clipped/blank thumbnails. Tune the accent colour and rounding below. For a fully flicker-free result, apply it through this plugin (it inlines the remote CSS).",
+    "categories": [{
+        "name": "Kaleidochromic",
+        "options": [
+            {
+                "type": "colorPicker",
+                "name": "Accent color",
+                "description": "Main accent colour used across the theme.",
+                "mode": "only_numbers",
+                "default": "#6279cd",
+                "css": ":root{--accent:$ !important;}"
+            },
+            {
+                "type": "selector",
+                "name": "Corner rounding",
+                "description": "Roundness of cards and panels.",
+                "css": "/*kal-rounding*/",
+                "selections": [
+                    { "name": "Default (12px)", "value": "d", "css": ":root{--rounding:12px;}" },
+                    { "name": "Sharp", "value": "s", "css": ":root{--rounding:0px;}" },
+                    { "name": "Extra round", "value": "r", "css": ":root{--rounding:20px;}" }
+                ]
+            }
+        ]
+    }],
+    "defaultCss": "@import url('https://cdn.jsdelivr.net/gh/Verakk/jellyfin-plugin-skin-manager@master/src/themes/kaleidochromic-enhanced/theme.css');"
+},
+{
     "name": "JellySkin",
     "author": "prayagprajapati17",
     "description": "A very bright and colorful look using lots of drop shadows. Theme is by prayag17.",

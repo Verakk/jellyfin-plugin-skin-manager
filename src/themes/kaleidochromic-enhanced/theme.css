@@ -1,0 +1,64 @@
+/* =============================================================================
+   Kaleidochromic (Enhanced) — for Jellyfin 10.10
+   -----------------------------------------------------------------------------
+   The original Kaleidochromic theme is by CTalvio / EdgeMentality
+   (https://github.com/CTalvio/Kaleidochromic), built on top of Monochromic.
+   This file imports the original unchanged and layers on top:
+     • fixes for two Jellyfin 10.10 image bugs — artwork flashing/fading, and
+       artwork being clipped/blanked;
+     • a couple of small polish tweaks.
+
+   When applied through the Skin Manager plugin, the remote @import below is
+   fetched and inlined into Custom CSS, which also removes the flash-of-unstyled-
+   content on navigation. Tune the accent colour from the plugin's options.
+   ============================================================================= */
+
+@import url('https://ctalvio.github.io/Kaleidochromic/default_style.css');
+
+/* -----------------------------------------------------------------------------
+   FIX 1 — "images flash / fade": Monochromic (Kaleidochromic's base) sets
+   `.cardImageContainer { transition: 0.7s }`, i.e. a 0.7s transition on EVERY
+   property. On Jellyfin 10.10 that makes card artwork visibly fade/flash on
+   scroll, hover and navigation. Restrict it to a short, clean opacity fade.
+   -------------------------------------------------------------------------- */
+.cardImageContainer {
+    transition: opacity 0.25s ease !important;
+}
+.blurhash-canvas {
+    transition: opacity 0.2s ease !important;
+}
+
+/* -----------------------------------------------------------------------------
+   FIX 2 — "images cut off / blank": Jellyfin 10.10 gives .cardImageContainer
+   `contain: strict` together with height:100%, which on several card types
+   resolves to 0 and clips/hides the artwork. Let it fill via its absolute inset
+   and relax the strict containment so the image always paints.
+   -------------------------------------------------------------------------- */
+.cardScalable .cardImageContainer,
+.cardContent.cardImageContainer {
+    height: auto !important;
+    contain: layout paint style !important;
+}
+
+/* -----------------------------------------------------------------------------
+   FIX 3 — backdrop: a filter on .itemBackdrop (which uses
+   `background-attachment: fixed`) breaks fixed-background rendering and makes the
+   backdrop flicker/disappear. Pin it to scroll so it renders reliably.
+   -------------------------------------------------------------------------- */
+.itemBackdrop {
+    background-attachment: scroll !important;
+}
+
+/* -----------------------------------------------------------------------------
+   Polish — keep artwork corners consistent with the theme's --rounding, and
+   stop the grey Jellyfin card padder showing through behind artwork.
+   -------------------------------------------------------------------------- */
+.cardImageContainer,
+.cardOverlayContainer,
+.blurhash-canvas {
+    border-radius: var(--rounding, 12px);
+}
+.cardPadder,
+.cardBox:not(.visualCardBox) .cardPadder {
+    background-color: transparent !important;
+}
