@@ -1,0 +1,20 @@
+[
+  {
+    "guid": "e9ca8b8e-ca6d-40e7-85dc-58e536df8eb3",
+    "name": "Skin Manager",
+    "description": "Download and install skins for Jellyfin (enhanced fork).",
+    "overview": "Browse, configure and apply CSS skins.",
+    "owner": "Verakk",
+    "category": "General",
+    "versions": [
+      {
+        "version": "2.1.0.0",
+        "changelog": "Fork catalog + FOUC inliner + JellyFlix and Kaleidochromic themes; built for .NET 9 / Jellyfin 10.11.",
+        "targetAbi": "10.11.0.0",
+        "sourceUrl": "https://github.com/Verakk/jellyfin-plugin-skin-manager/releases/download/v2.1.0/skin-manager-2.1.0.zip",
+        "checksum": "147acf0d74577115f48741f0d4b2fac3",
+        "timestamp": "2026-07-14T21:06:00Z"
+      }
+    ]
+  }
+]
