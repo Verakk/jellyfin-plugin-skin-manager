@@ -1,16 +1,17 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>NET8.0</TargetFramework>
+    <TargetFramework>net9.0</TargetFramework>
     <IsPackable>true</IsPackable>
-    <AssemblyVersion>2.0.2</AssemblyVersion>
-    <FileVersion>2.0.2</FileVersion>
+    <AssemblyVersion>2.1.0</AssemblyVersion>
+    <FileVersion>2.1.0</FileVersion>
     <Authors />
     <Company />
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Jellyfin.Controller" Version="10.10.0" />
+    <!-- Jellyfin 10.11 runs on .NET 9; the Controller package provides the plugin API. -->
+    <PackageReference Include="Jellyfin.Controller" Version="10.11.5" />
   </ItemGroup>
 
   <ItemGroup>
@@ -23,12 +24,6 @@
 
   <ItemGroup>
     <Folder Include="Properties\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="MediaBrowser.Api">
-      <HintPath>..\..\..\..\..\..\Program Files\Jellyfin\Server\MediaBrowser.Api.dll</HintPath>
-    </Reference>
   </ItemGroup>
 
 </Project>
