@@ -204,13 +204,15 @@ h1, h2, h3, .sectionTitle, .pageTitle {
     background-color: #0d0d0d;
 }
 
-/* Relax Jellyfin's `contain: strict` on the image container. Its `size`
-   containment together with height:100% stops the background artwork from
-   painting when an ancestor is transformed — this is what blanked cards on
-   hover (confirmed: removing the height makes the image reappear). Keep layout
-   + paint so the rounded corners still clip. */
+/* CONFIRMED VIA DEVTOOLS: Jellyfin's `.cardScalable .cardImageContainer` sets
+   `height: 100%` (with `contain: strict`), and on several card types that
+   resolves to 0 and hides the background artwork (card goes black). Disabling
+   that height makes the image reappear. So we override it to auto and let the
+   container fill via its absolute inset instead, and relax the strict
+   containment so nothing clips the paint. */
 .cardScalable .cardImageContainer,
 .cardContent.cardImageContainer {
+    height: auto !important;
     contain: layout paint style !important;
 }
 
