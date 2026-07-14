@@ -65,16 +65,25 @@ body,
 .backgroundContainer,
 .mainAnimatedPages,
 .dashboardDocument {
-    background-color: var(--nfx-bg) !important;
     color: var(--nfx-text);
     font-family: var(--nfx-font) !important;
 }
 
-/* Flat Netflix-black canvas: the base background-color above already gives a
-   clean, uniform #141414 on the home/library pages (no gradient).
-   IMPORTANT: do NOT force `background-image: none` on .backgroundContainer —
-   Jellyfin paints the item's backdrop as a background-image on that same
-   container on detail pages, so killing it removed the detail-page hero banner. */
+/* Flat Netflix-black canvas — but the black must live ONLY on the root
+   (html/body), which sits BEHIND Jellyfin's backdrop layer. Painting an opaque
+   background-color on the page wrappers (.backgroundContainer / .mainAnimatedPages
+   / .dashboardDocument) covers the detail-page backdrop banner — CONFIRMED via
+   DevTools: disabling that colour makes the banner appear. So keep those wrappers
+   transparent; body-black still shows through wherever there is no backdrop. */
+html,
+body {
+    background-color: var(--nfx-bg) !important;
+}
+.backgroundContainer,
+.mainAnimatedPages,
+.dashboardDocument {
+    background-color: transparent !important;
+}
 
 body {
     -webkit-font-smoothing: antialiased;
