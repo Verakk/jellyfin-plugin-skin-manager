@@ -17,6 +17,8 @@
    heights or positions — so page structure and text flow stay intact.
    ============================================================================= */
 
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap');
+
 :root {
     /* Brand */
     --nfx-red:            #e50914;
@@ -32,7 +34,7 @@
 
     /* Layered depth (keeps the canvas from looking flat) */
     --nfx-red-glow:       rgba(229, 9, 20, 0.33);
-    --nfx-canvas:         radial-gradient(135% 95% at 50% -12%, #1e1e1e 0%, #151515 42%, #0c0c0c 100%);
+    --nfx-canvas:         radial-gradient(120% 90% at 50% -8%, #272727 0%, #151515 45%, #070707 100%);
     --nfx-header-grad:    linear-gradient(180deg, #0f0f0f 0%, #171717 100%);
     --nfx-drawer-grad:    linear-gradient(180deg, #121212 0%, #090909 100%);
     --nfx-surface-grad:   linear-gradient(180deg, #212121 0%, #171717 100%);
@@ -48,11 +50,11 @@
     /* Shape & motion */
     --nfx-radius:         4px;
     --nfx-radius-lg:      6px;
-    --nfx-card-hover:     1.1;       /* poster lift on hover (kept modest so scaled cards aren't clipped) */
+    --nfx-card-hover:     1.13;      /* poster lift on hover (kept modest so scaled cards aren't clipped) */
     --nfx-ease:          cubic-bezier(0.25, 0.46, 0.45, 0.94);
 
     /* Typography — Netflix ships "Netflix Sans"; this is the closest free fallback stack */
-    --nfx-font: "Helvetica Neue", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --nfx-font: "Roboto", "Helvetica Neue", "Segoe UI", Helvetica, Arial, sans-serif;
 }
 
 /* -----------------------------------------------------------------------------
