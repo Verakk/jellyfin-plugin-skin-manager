@@ -347,6 +347,14 @@ h1, h2, h3, .sectionTitle, .pageTitle {
    the fixed background intact. */
 .itemBackdrop {
     position: relative;
+    /* `background-attachment: fixed` (Jellyfin's default) is fragile: an ancestor
+       transform (page transitions) or any effect breaks fixed-background
+       rendering, leaving the backdrop blank so the page's background colour shows
+       through — that's the "banner disappears / it's just a colour" symptom.
+       Pin it to scroll so the artwork always paints, and keep the element itself
+       transparent so no colour covers the image. */
+    background-attachment: scroll !important;
+    background-color: transparent !important;
 }
 .itemBackdrop::after {
     content: "";
