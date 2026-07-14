@@ -70,14 +70,11 @@ body,
     font-family: var(--nfx-font) !important;
 }
 
-/* Flat Netflix-black canvas — clean and uniform, no gradient. Force off any
-   inherited/background layering so the page reads as a single dark slab. */
-body,
-.backgroundContainer,
-.mainAnimatedPages {
-    background-image: none !important;
-    background-color: var(--nfx-bg) !important;
-}
+/* Flat Netflix-black canvas: the base background-color above already gives a
+   clean, uniform #141414 on the home/library pages (no gradient).
+   IMPORTANT: do NOT force `background-image: none` on .backgroundContainer —
+   Jellyfin paints the item's backdrop as a background-image on that same
+   container on detail pages, so killing it removed the detail-page hero banner. */
 
 body {
     -webkit-font-smoothing: antialiased;
@@ -216,10 +213,19 @@ h1, h2, h3, .sectionTitle, .pageTitle {
    visible, instead of the flat grey veil that hid the image on hover. */
 .cardOverlayContainer {
     background: linear-gradient(to top,
-        rgba(0, 0, 0, 0.82) 0%,
-        rgba(0, 0, 0, 0.18) 45%,
-        rgba(0, 0, 0, 0) 72%) !important;
+        rgba(0, 0, 0, 0.7) 0%,
+        rgba(0, 0, 0, 0) 42%) !important;
     border-radius: var(--nfx-radius);
+}
+
+/* Keep the artwork fully visible on hover — the overlay must never hide it */
+.card:hover .cardImageContainer,
+.card:focus-within .cardImageContainer,
+.card:hover .cardImage,
+.card:hover .cardImageContainer > img,
+.card:hover .cardImageContainer[style*="background-image"] {
+    opacity: 1 !important;
+    visibility: visible !important;
 }
 
 /* Centre play affordance and overlay action buttons */
