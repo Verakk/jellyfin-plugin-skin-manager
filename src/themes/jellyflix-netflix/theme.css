@@ -38,9 +38,9 @@
     --nfx-header-grad:    linear-gradient(180deg, #0f0f0f 0%, #171717 100%);
     --nfx-drawer-grad:    linear-gradient(180deg, #121212 0%, #090909 100%);
     --nfx-surface-grad:   linear-gradient(180deg, #212121 0%, #171717 100%);
-    --nfx-shadow-hover:   0 16px 40px rgba(0, 0, 0, 0.9),
-                          0 0 0 1px rgba(255, 255, 255, 0.14),
-                          0 10px 30px var(--nfx-red-glow);
+    --nfx-shadow-hover:   0 24px 60px rgba(0, 0, 0, 0.95),
+                          0 0 0 2px rgba(255, 255, 255, 0.16),
+                          0 16px 44px var(--nfx-red-glow);
 
     /* Text */
     --nfx-text:           #ffffff;
@@ -50,7 +50,7 @@
     /* Shape & motion */
     --nfx-radius:         4px;
     --nfx-radius-lg:      6px;
-    --nfx-card-hover:     1.13;      /* poster lift on hover (kept modest so scaled cards aren't clipped) */
+    --nfx-card-hover:     1.22;      /* carousel-style hover lift (rows get extra vertical room below so it isn't clipped) */
     --nfx-ease:          cubic-bezier(0.25, 0.46, 0.45, 0.94);
 
     /* Typography — Netflix ships "Netflix Sans"; this is the closest free fallback stack */
@@ -234,7 +234,7 @@ h1, h2, h3, .sectionTitle, .pageTitle {
 
 /* Netflix-style hover: lift the poster, add depth, bring it to the front */
 .card:hover {
-    z-index: 30;
+    z-index: 999;
 }
 .card:focus .cardScalable,
 .card:hover .cardScalable {
@@ -484,7 +484,7 @@ input:checked + .mdl-switch__label + .mdl-switch__track ~ .mdl-switch__thumb,
 }
 .card:hover .cardImageContainer,
 .card:focus-within .cardImageContainer {
-    filter: brightness(1.09) contrast(1.03);
+    filter: brightness(1.12) contrast(1.05);
 }
 .card:hover .cardScalable,
 .card:focus .cardScalable {
@@ -496,7 +496,7 @@ input:checked + .mdl-switch__label + .mdl-switch__track ~ .mdl-switch__thumb,
 .card.backdropCard:hover .cardScalable,
 .overflowBackdropCard:hover .cardScalable,
 .card.bannerCard:hover .cardScalable {
-    transform: scale(1.045);
+    transform: scale(1.12);
 }
 
 /* Give library tile labels a cinematic drop shadow over the artwork */
@@ -531,4 +531,37 @@ input:checked + .mdl-switch__label + .mdl-switch__track ~ .mdl-switch__thumb,
 .itemsContainer:hover .card:not(:hover) {
     opacity: 0.82;
     transition: opacity 0.25s var(--nfx-ease);
+}
+
+/* =============================================================================
+   Hover XL — carousel-style poster grow
+   The poster scales up strongly in place, rises above its neighbours, and the
+   row gets extra vertical room so the enlarged card isn't clipped. A short
+   hover delay makes it feel deliberate rather than jumpy. A true "push the
+   neighbours aside" carousel needs JS, so this is the closest pure-CSS form.
+   ============================================================================= */
+
+/* Deliberate hover-in delay (no delay on hover-out so it snaps back cleanly) */
+.card:hover .cardScalable,
+.card:focus .cardScalable {
+    transition: transform 0.32s var(--nfx-ease) 0.12s,
+                box-shadow 0.32s var(--nfx-ease) 0.12s;
+}
+
+/* Extra vertical breathing room on horizontal rows so the grown poster has
+   somewhere to expand into instead of being cut off by the scroll box. */
+.itemsContainer.scrollSlider,
+.scrollSlider {
+    padding-top: 26px;
+    padding-bottom: 26px;
+}
+
+/* Edge posters grow inward so they never spill off the screen */
+.itemsContainer > .card:first-child:hover .cardScalable,
+.scrollSlider > .card:first-child:hover .cardScalable {
+    transform-origin: left center;
+}
+.itemsContainer > .card:last-child:hover .cardScalable,
+.scrollSlider > .card:last-child:hover .cardScalable {
+    transform-origin: right center;
 }
