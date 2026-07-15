@@ -133,3 +133,74 @@
 .backdropImage {
     filter: blur(42px) saturate(160%) contrast(120%) brightness(27%) !important;
 }
+
+/* =============================================================================
+   DRASTIC LOOK UPGRADE — make the whole app feel premium (over Kaleidochromic).
+   Netflix-style poster hover with an accent glow, punchier headers, cinematic
+   depth. Uses the theme's own --accent so it stays cohesive with the blue look.
+   ============================================================================= */
+
+/* Poster hover: lift the whole tile (art + title) with an accent-tinted glow.
+   Monochromic doesn't zoom cards, so this alone transforms the feel. */
+.card {
+    z-index: 1;
+}
+.card > .cardBox {
+    transition: transform 0.32s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+.card:hover {
+    z-index: 999;
+}
+.card:hover > .cardBox,
+.card:focus > .cardBox {
+    transform: scale(1.09);
+}
+.card:hover .cardScalable,
+.card:focus .cardScalable {
+    box-shadow:
+        0 18px 44px rgba(0, 0, 0, 0.9),
+        0 0 0 1px rgba(var(--accent), 0.55),
+        0 12px 34px rgba(var(--accent), 0.35) !important;
+}
+/* edge posters grow inward so they aren't clipped off-screen */
+.itemsContainer > .card:first-child:hover > .cardBox { transform-origin: left center; }
+.itemsContainer > .card:last-child:hover > .cardBox { transform-origin: right center; }
+/* give rows vertical room + focus the hovered card by dimming its neighbours */
+.itemsContainer.scrollSlider,
+.scrollSlider {
+    padding-top: 14px;
+    padding-bottom: 14px;
+}
+.itemsContainer:hover .card:not(:hover) {
+    opacity: 0.82;
+    transition: opacity 0.25s ease;
+}
+
+/* Punchier, bolder section/row headers */
+.sectionTitle,
+.homeSectionsContainer .sectionTitle {
+    font-weight: 800 !important;
+    letter-spacing: 0.3px;
+    font-size: 1.45em !important;
+}
+
+/* Accent-tinted glow on the primary action buttons (Play etc.) */
+.detailPagePrimaryContent .btnPlay,
+.mainDetailButtons .raised,
+.raised.detailButton-primary {
+    box-shadow: 0 8px 22px rgba(var(--accent), 0.4) !important;
+    transition: filter 0.2s ease, box-shadow 0.2s ease !important;
+}
+.detailPagePrimaryContent .btnPlay:hover,
+.mainDetailButtons .raised:hover {
+    filter: brightness(1.12) !important;
+}
+
+/* Slimmer, accent scrollbars to match */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-thumb {
+    background: rgba(var(--accent), 0.55);
+    border-radius: 8px;
+}
+::-webkit-scrollbar-thumb:hover { background: rgba(var(--accent), 0.8); }
+::-webkit-scrollbar-track { background: transparent; }
